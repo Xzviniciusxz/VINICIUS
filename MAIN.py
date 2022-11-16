@@ -1,22 +1,26 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import PySimpleGUI as sg
-from PIL import Image
-from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+import pandas as pd #Biblioteca pra ler arquivos CSV, Execel e etc...
+import matplotlib.pyplot as plt #BiBlioteca pra criar os Graficos
+import PySimpleGUI as sg #Biblioteca para criar as janelas
+from PIL import Image #Biblioteca para inserir imagem
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator #Biblioteca para criar a nuvem de palavras 
 
+#Criando janela e selecionando arquivo CSV
 Caminho = sg.popup_get_file('Chosse a CSV file:', sg.theme('Dark Amber'))
 CSV = pd.read_csv(Caminho)
 CSV_I = pd.read_csv(Caminho)
 CSV_DT = pd.DataFrame(CSV)
 
+#Removendo colunas não utilizadas na criação de Graficos
 CSV_DT.drop(["Carimbo de data/hora",
         "3. Informe os 7 últimos dígitos do seu RA: (109nnnxxxxxxx)",
         "7. Agora vamos falar sobre sua idade:Em qual dia você nasceu?", 
         "7-1. Em qual mês você nasceu?"], inplace=True, axis=1)
 
+#inserindo coluna de idade e subtraindo a coluna de ano de nacimento
 CSV.insert(0, "Idades", 2022) 
 CSV_DT["Idades"] =  CSV["Idades"] - CSV_DT["7-2. Em qual ano você nasceu?"]
 
+#
 summary = CSV_DT.dropna(subset=["42. Escreva algumas linhas sobre sua história e seus sonhos de vida."], axis = 0) ["42. Escreva algumas linhas sobre sua história e seus sonhos de vida."]
 
 all_summary = " ".join(s for s in summary)
@@ -50,8 +54,6 @@ def janela_Graficos():
 window = janela_Graficos()
 
 
-
-
 while True:
     event, values = window.read()
 
@@ -64,7 +66,8 @@ while True:
             Grafico = CalcularCSV[0]
             GraficoValor = contCSV.value_counts()
 
-            plt.pie(GraficoValor,  shadow=False,  startangle=90)
+            explode = (0.1,0,0,0)
+            plt.pie(GraficoValor,  shadow=True,  startangle=90)#, colors= ['y','r'])
             plt.title(Grafico)
             plt.legend(GraficoValor.index, ncol=1, loc="upper right", bbox_to_anchor=(1.2,1), prop={'size': 8}) #, loc="lower left")
             plt.axis("equal")
